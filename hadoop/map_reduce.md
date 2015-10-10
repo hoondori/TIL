@@ -10,7 +10,8 @@
 
 ## Hadoop을 이용한 병렬 처리
 
-![hadoop_mapreduce_1](https://github.com/hoondori/TIL/images/hadoop_mapreduce_1.png)
+![hadoop_mapreduce_1]
+(https://github.com/hoondori/TIL/blob/master/images/hadoop_mapreduce_1.png)
 
 ### Mapper setup
 - input key/value type
@@ -74,9 +75,9 @@ job.waitForCompletion(true)
 
 ## Scale out 수행 구조
 
-![hadoop_mapreduce_2](https://github.com/hoondori/TIL/images/hadoop_mapreduce_2.png)
+![hadoop_mapreduce_2](https://github.com/hoondori/TIL/blob/master/images/hadoop_mapreduce_2.png)
 
-![hadoop_mapreduce_3](https://github.com/hoondori/TIL/images/hadoop_mapreduce_3.png)
+![hadoop_mapreduce_3](https://github.com/hoondori/TIL/blob/master/images/hadoop_mapreduce_3.png)
 
 *  scale out 구조를 위해서 In/Out 파일을 HDFS에 저장
 * resource management로 YARN 사용
