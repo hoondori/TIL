@@ -19,7 +19,7 @@ generic resource management framework for implementing distributed application
 * resource-management가 Hadoop 안으로 들어온 구조
 * JobTracker, TaskTracker
 * Start running jobtracker daemon as a shared resource across jobs, across users
-* ==오직 MapReduce 작업을 위해서만 존재==
+* **오직 MapReduce 작업을 위해서만 존재**
 
 ### 4세대 : YARN
 * MapReduce 밖으로 resource management가 다시 나옴
