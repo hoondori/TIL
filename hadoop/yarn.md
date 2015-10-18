@@ -4,7 +4,7 @@ generic resource management framework for implementing distributed application
 ## YARN의 탄생 스토리
 ### 1세대 : Yahoo 초창기 때 MapReduce 수행을 위해 private-cluster 운영
 * 각각의 사용자들이 소수의 자기 노드로 폐쇄형 운영
-* **==Multitenency 지원 안됨==**
+* **Multitenency 지원 안됨**
 * 한정된 자원(node)를 다수의 사용자가 공유하는 문제 => 수동으로 협의 => 불편
 * 우리로 예기하면 Vmware 자원을 메일로 사용 알림을 하는 상황
 
@@ -13,7 +13,7 @@ generic resource management framework for implementing distributed application
 * YARN 초창기 모델
 * 매 사용자의 요청마다 새로 private cluster를 동적으로 생성/파괴하는 구조
  * 사용자가 어떤 node를 쓸 건지 선택해야
- * ==worker node는 다른 사용자와 공유가 안됨==
+ * **worker node는 다른 사용자와 공유가 안됨**
 
 ### 3세대 : Resource managment inside Hadoop
 * resource-management가 Hadoop 안으로 들어온 구조
@@ -32,11 +32,11 @@ YARN은 이러한 사항을 잘 준수하고 있다.
 * Scalability
 * Serviceability
 * Multitenancy
-* **==Locality Awareness==** : computation을 최대한 data 가깝게 이동
-* **==High Cluster Utilization==** : node의 자원 이용률의 극대화
+* **Locality Awareness** : computation을 최대한 data 가깝게 이동
+* **High Cluster Utilization** : node의 자원 이용률의 극대화
 * Secure and Auditable Operation
 * Reliability and Availability
-* **==Support for Programming Model Diversity==** : non MapReduce 지원
+* **Support for Programming Model Diversity** : non MapReduce 지원
 * Flexible Resource Model
 * Backward Compatibility - legacy MapReduce 지원
 
@@ -57,6 +57,7 @@ YARN은 이러한 사항을 잘 준수하고 있다.
 
 ## Hadoop 2.0 YARN
 ![hadoop_yarn_2](https://github.com/hoondori/TIL/blob/master/images/hadoop_yarn_2.png)
+
 기존 jobtracker의 두 가지 역할을 ResourceManager와 ApplicationMaster로 이원화
 
 * ResourceMananger는 모든 app에 의해 이용되는 모든 자원에 대한 관리 역할을 하는 반면
@@ -86,7 +87,7 @@ YARN은 이러한 사항을 잘 준수하고 있다.
  * 기존에는 jobtracker에서 scheduling하랴, fault-tolerant하랴... not scalable
 
 ### ResourceRequest and ResourceContainer
-![hadoop_yarn_3](https://github.com/hoondori/TIL/blob/master/images/hadoop_yarn_3.png)
+![hadoop_yarn_5](https://github.com/hoondori/TIL/blob/master/images/hadoop_yarn_5.png)
 
 * Resource Request via ApplicationMaster
  * 나한테 이정도의 메모리/CPU/Storage 줘!! (현재 YARN은 메모리랑 CPU만 지원)
@@ -119,13 +120,13 @@ YARN은 이러한 사항을 잘 준수하고 있다.
 #### 종류
 
 ##### FIFO
-![hadoop_yarn_4](https://github.com/hoondori/TIL/blob/master/images/hadoop_yarn_4.png)
+![hadoop_yarn_3](https://github.com/hoondori/TIL/blob/master/images/hadoop_yarn_3.png)
 
 * 공정성은 극대화하나 다른 목표들은 매우 poor
 * small workloads on large-scale clusters인 경우나 적합하나 자원 경쟁이 극심한 상황에서는 부적합
 
 ##### Capacity
-![hadoop_yarn_5](https://github.com/hoondori/TIL/blob/master/images/hadoop_yarn_5.png)
+![hadoop_yarn_4](https://github.com/hoondori/TIL/blob/master/images/hadoop_yarn_4.png)
 
 * 각 organizational unit or group별로 독립된 queue를 가짐, Admin 설정
 * 각 queue는 minimum guranteed capacipty, maximum soft/hard limits of capcity를 가짐
