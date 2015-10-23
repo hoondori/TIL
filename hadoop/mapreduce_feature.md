@@ -91,24 +91,41 @@ sys.stderr.write("reporter:counter:Temperature,Missing,1\n")
  * partitioner를 이용해서 같은 reducer로 모이게 하고
  * comparator를 이용해서 정렬 방식을 조정한다.=> first by 년도, second by 온도
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 ## Joins
 
+### Map-side Joins
+
+* 두 개의 large inputs이 있고, 양자간에 join key가 존재한다고 할 때
+* mapper의 입력으로 동일한 join key를 가지는 partition들이 오면 된다.
+ * 사실상 mapper 이전에 어찌됬건 sorting/partition이 잘 되야 하는 전제
+ * 사실상 비현실적 가정
+
+
+### Reduce-side Joins
+
+* map-side와 같은 제약조건은 없음
+* 동일한 join key를 갖는 record들을 어떻게 reducer에 모이게 할 것인지가 관건
+* 기본 아이디어는 join key를 mapper의 output key의 일부분이 되야 하고 partitioner가 해당 join key를 바탕으로 partition을 나눈다.
+ * 이 경우 각 input에서 생성된 partition 두 개가 reducer에 모이게 되고 각 record에는 동일한 join key가 존재할 것이다.
 
 ## Side Data Distribution
+
+* Side data는 job에서 main dataset을 처리하기 위해 필요한 추가 데이터, 일종의 글로벌 객체모음
+* 모든 map/reduce task에서 이것이 visible 해야 한다.
+
+### Using Job configuration
+
+* job configuration에 key-value pair로 추가하면 어디에서든지 이것이 접근 가능
+* 소규모 metadata를 side data로 사용할 때나 적합 (수 kbytes)
+* primitive type은 즉시 key-value pair로 설정 가능하나 object type은 serialization/deserialization이 필요
+ * Default's Hadoop Stringfier
+
+### Distributed Cache
+
+* hadoop distributed cache를 이용해서 side data 운용
+* copy files/archives to the task node and use them
+* command line에서 files, libjars, archives 옵션으로 전달
+ * 내부적으로 이것들이 HDFS에 저장되고
+ * 각 node manager에서 task 수행 전에 이를 복사해서 node 내에 local file system 내에 위치
+* 이것은 cache된 것이다. 즉 필요할 때 복사되고, 그 즉시 지우지는 않고 reference count를 추적해서 필요없을 때까지 보관
+* 다만 이것이 너무 커지면(ex. 10GB) 각 node manager에서는 Least recently used 정책에 의해 일부 cache 제거
