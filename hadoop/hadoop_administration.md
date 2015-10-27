@@ -121,6 +121,83 @@
 * short-circuit local reads
  * 만약 client가 data가 위치한 node상에 있다면 굳이 통신으로 데이터 전달하지 말고 unix socket과 같은 것으로 더 빨리 전달
 
+## Security
+
+Hadoop 자체에는 credential 처리 없고 Kerberos 에 의존
+이를 통해 authentication/authorization
+
+### Kerberos and Hadoop
+
+Authentication
+* client는 Authentication Server로부터 TGT 확보
+
+Autorization
+* TGT를 들고 Ticket Granting Server로 가서 Service Ticket확보
+
+Service Request
+* Service Ticket을 들고 각 서비스 서버로 가서 인증
+
+kinit command를 통해 TGT를 발급받으면 10시간 유효
+다만 Service Ticket민 Service Request는 건건마다 해야 함
+
+기본은 kerberos disable이므로 명시적으로 설정 필요
+
+### Delegation Tokens
+
+각 call마다 authenticat하려니 KDC에 너무 과부하
+KDC 권한을 대리해는 역할이 있으면 KDC에 안물어봐도 됨
+
+* namenode에서 delegation token을 발급함으로써 모든 job call마다 일일이 인증안해도 됨
+* namenode에서 block access token을 발급함으로써 모든 block access에 대해서 datanode들에세 일일이 인증안해도 됨
+
+### Other Security Enhancements
+
+deamon을 돌리는 계정과 Job 수행 계정이 달라야 안전
+* 그래야 서로 칸막이 효과
+
+distributed cache를 private으로
+* 안그러면 아무나 읽고 쓰기 가능
+
+가짜 서버가 commisson되지 않도록 ACL 잘 관리
+* 가짜 secondary namenode, dtanode, node manager 주의
+
+필요하면 전통신 데이터 암호화
+
+## Benchmark Hadoop cluster
+
+외부 제공 benchmark
+* hadoop-mapreduce-tests.jar
+* Terasort
+* TestDFSIO
+* MRBench
+* NNBench
+* Gridmix
+* SWIM
+
+가능하면 남의 거로 말고 자신의 것으로 Benchmark하며 tuning 해라.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
