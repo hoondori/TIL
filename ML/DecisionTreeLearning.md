@@ -75,6 +75,101 @@ GINI Index
 
 돈 받고 파는 것 => C5.0
 
+## Attribute 속성에 따른 고려사항
+
+Attribute의 속성 종류
+* Binary Attribute. ex) Man/Woman
+* Nominal vs Ordinal
+ * Nominal은 naming이 가능한 하나하나의 독립된 개체. ex) Man/Woman
+ * Ordinal은 순서 있는 것. ex) Small/Medium/Large
+* Discrete vs Continuous
+* Categorical
+
+Binary Split vs MultiWay Split
+* Binary split
+ * ex) Man/Woman, Seoul/(Dageu,Busan), Length가 1보다 작거나 크거나
+* Multiway split
+ * Seoul or Dageu or Busan, Length가 (1,2) 구간, (2,3)구간, (3,4)구간 ...
+
+주의사항
+* Ordinal의 경우에는 Binary Split의 경우 순서 속성이 어그러지면 안된다.
+ * ex) Small/(Medium,Large) 는 맞지만, Medium/(Small,Large) 는 안된다.
+
+Learning시의 속성 종류별 고려사항
+* binary split과 multiway split을 모두 해보고 가장 heuristics 수치가 높은 방향으로 전개
+ * Binary split의 경우는 경우의 수가 상당히 많을 수 있음
+* Continous attribute + binary split
+ * 해당 속성을 정렬, O(NlogN)
+ * 중간값들을 candidate split points로 보고 각각 heuristics 계산. 가장 높은 것을 택해서 binary split
+
+
+## Overfitting and Pruning
+
+model이 복잡해지면 overfitting 가능성이 커진다.
+단순한 모델이 더 좋다 => Occam's Razor, or principle of pasimony, or minimum description of length principle
+적당한 선에서 tree가 너무 커지지 않게 해야 한다. => Pruning
+
+(참고) 왜 overfitting이 생기나?
+* due to presence of noise
+* due to lack of representative sample
+* due to multiple comparision procedure
+
+Pre-pruing vs Post-pruing
+* pre-pruning은 학습 데이터에 완전히 fit하기 전이라도 stopping criteria에 의해 tree 성장이 종료
+* post-pruning은 일단 학습 데이터에 대해 완전히 fit한 후에 다시 축소해 나가는 과정
+* 일반적으로 pre-pruning은 too-early stop to learn 현상이 있어서 post-pruing 선호
+
+Pre-pruning
+* chi-square test와 같은 statistical significance test를 이용
+* 특정 노드에서 판단컨데 어떤 attribute를 쓰더라도 추가적인 split이 통계적으로 insignificant하다면 추가적 split 중단
+* 좋을 때 : 일반적으로 post-pruning보다 빨리 끝나니...
+* 최악일 때 : XOR problem과 같은 상황이 있을 때 early stop 현상 발생, 그러나 현실에서 이런 상황 흔치는 않음
+
+Post-pruning
+* 핵심 아이디어
+ * 일단 trainging error rate가 100% 될 때까지 full-tree로 키워라
+ * bottom node부터 각 노드를 simplifiy하여 성능 지표(ex. error rate)가 저하되지 않는 선에서 pruning
+* 어떻게 simplify?
+ * subtree replacement - subtree 전체 삭제
+ * subtree raising - 직속 부모 삭제하고 bubble up
+* 어떻게 성능 측정?
+ * based on error rate
+ * based on confidence interval (C4.5방식)
+
+
+## Complexity 분석
+
+가정
+* M attributes
+* N training instances
+* tree depth : O(logN) <- binrary decision tree, worst case
+
+Tree Construction => O( MNlogN )
+Pruing
+* Subtree replacement - O(N)
+* Subtree raising - O(N(logN)^2)
+
+Total Cost = O(MNlogN) + O(N(logN)^2)
+
+
+## Tree to Rule, Decision List vs Decision Tree
+
+## Regression Tree
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
