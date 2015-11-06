@@ -19,3 +19,4 @@
 ## Reference
 https://www.quora.com/What-are-unit-economics
 http://www.slideshare.net/austinneudecker/startup-unit-economics-and-financial-model
+https://youtu.be/Ehkg3_UwzpY
