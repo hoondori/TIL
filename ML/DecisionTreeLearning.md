@@ -152,6 +152,48 @@ Pruing
 Total Cost = O(MNlogN) + O(N(logN)^2)
 
 
+## Learning시 좀더 Practical한 고려사항들
+
+### Hunt 알고리즘에서 보강사항
+
+* **unseen records 현상**
+ * ex) child node에서 Empty Set이 나오는 경우
+ * 대처 : parent node에서 major한 class label을 empty set의 label로 지정 (매우 heuristic한 접근)
+* **unable to split 현상**
+ * ex) node 내에 모인 모든 record들이 동일한 속성들을 가지고 있는데 label은 다른 경우
+ * 근본적으로 feature가 부족해서 나온 현상이므로 feature를 추가하는게 맞으나
+ * 임기응변적 대처는 unseen records현상 대응처럼 처리
+
+### impurity measure 종류에 너무 집착하지 말라. 성능은 pruning 대응에서 차이가 난다.
+
+### non-rectangular decision boundary 대응
+
+* decision tree는 단일 속성에 대해 split을 하는 경우라면 rectangular decision boundary만 표현하는 한계
+* multiple attributes를 고려하여 split을 하는 테크닉을 쓰면 좀 더 complex한 decision boundary를 표현할 수 있다.
+* 다만 computationally expensive하다.
+
+### Data fragmentaton 현상 및 대응
+
+* node가 너무 적은 수의 records 를 대표한다.
+* 즉 decision region이 너무 파편화되어 너무 많다.
+* 대응 : 특정 records 수 이하로 split되지 않도록 threshold를 설정한다.
+
+### Tree Replication 현상 및 대응
+
+* 똑같이 생긴 subtree가 두 개 이상 생기는 현상
+* 모델을 해석함에 있어서 매우 난처해지는 상황 => less descriptive for explaining phenomenon
+* 대응 : ??
+
+### Redundant 속성 존재에 따른 영향도
+
+* redundant가 있으면 다른 classification learning 기법에서는 일반적으로 성능 저하
+* 반면 decision tree는 영향도가 적다. 왜나하면 split시에 duplicate된 두 가지 속성이 둘다 쓰이지 않으므로(??)
+
+### Many irrelavant 속성 존재에 따른 영향도
+
+* irrelavant한 속성이 split 조건으로 쓰이는 대참사 발생. ex) timestamp
+* feature selection을 통해 정제된 속성만 사용해야 한다.
+
 ## Tree to Rule, Decision List vs Decision Tree
 
 ## Regression Tree
