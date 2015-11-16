@@ -16,3 +16,10 @@
 
 ## Linear Regression
 
+
+## Statistical Inference
+
+* [MIT 강좌 중심](https://www.youtube.com/playlist?list=PLUl4u3cNGP61MdtwGTqZA0MreSaDybji8)
+* Parameter가 R.V라고 가정하는 Baysian approach와 Parameter가 R.V가 아니라고 가정하는 Classical approach
+* Estimator : Baysican approach에서는 MAP, Classical approach에서는 ML
+* Confidence Interfal for Estimator

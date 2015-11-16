@@ -194,7 +194,28 @@ Total Cost = O(MNlogN) + O(N(logN)^2)
 * irrelavant한 속성이 split 조건으로 쓰이는 대참사 발생. ex) timestamp
 * feature selection을 통해 정제된 속성만 사용해야 한다.
 
+## Model Selection
+
+결국 학습된 모델(혹은 classifier, estimator)을 어떻게 평가할 것인가로 귀결
+
+* Handout method : Train Set과 Test Set의 disjoint set으로 나누고 Test Set에 근거해 모델 성능 평가
+ * 양 Set을 어떻게 구성하느냐에 따라 결과가 달라짐. ex) Too small train set => High Variance
+* Random subsampling
+ * holdout method를 수차례 반복하여 평가 지표를 평균화한다.
+* Cross-validation
+ * 각 레코드는 동일 횟수만큼 training에 사용되고 단 한번 test에 사용된다.
+ * k-fold cross-validation
+ * leave-one-out approach
+ * 최종 평가 지표는 각 iteration에서 도출된 평가 지표를 평균화한 것이다.
+* Bootstrap
+ * resampling with replacement
+ * 다른 방식들은 모두 without replacement
+ * .632 bootstrap
+
 ## Tree to Rule, Decision List vs Decision Tree
+
+
+
 
 ## Regression Tree
 
