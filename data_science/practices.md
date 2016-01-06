@@ -26,6 +26,8 @@ Lesson 4 : Find out feature singularity
 * irregular distribution for continuous feature on each response(cateogircal) - look out outliers
 * histogram of reponse(categorical)
 
+Lesson 5 : Mind of Proper Scaling when it comes to visualization
+
 Technique 1 : Feature Selection
 
 * For each of N features, measure predictability by RMSE score of linear classifier
@@ -33,6 +35,17 @@ Technique 1 : Feature Selection
 Technique 2 : Simplify data
 
 * Make categorical or hot-encoding data out of continuous data
+* dummy variables - out of categorical variables, sometimes remove less relavant category value
+
+Technique 3 : Imputation
+
+* fill with mean or median
+* fill with random selection between mean-std and mean+std
+
+Technique 4 : Make feature from other features
+
+* extract categorical values from other feature's string
+
 
 
 
