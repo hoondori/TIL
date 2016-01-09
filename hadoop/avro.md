@@ -1,5 +1,15 @@
 # Avro
 
+## What and Why
+
+* language-neutral serialization system
+* to address the major downside of Hadoop Writables
+* supports : C, C++, C#, Java, JavaScript, Perl, PHP, Python, Ruby
+ * cf) Thrift supports :  C++, C#, Erlang, Haskell, Java, Objective C/Cocoa, OCaml, Perl, PHP, Python, Ruby, and Squeak
+ * cf) Protocol buffers :  C++, Java, and Python, ...
+* key feature : code-gen is not needed
+
+
 ## Thrift/Proto와의 비교
 
 * 참고문서
@@ -47,13 +57,16 @@
  * Java reflection을 이용해서 type guessing
  * slower
 
-참고) Avro String은 Java String이나 Avro UTF8 둘 중의 하나로 매핑 가능하나 UTF8은 mutable하므로 더 편리/효과적
+참고) Avro String은 Java String이나 Avro UTF8 둘 중의 하나로 매핑 가능하나 UTF8은 Lazy/mutable하므로 더 편리/효과적
 
 ### In-memory serialization/deserialization
 
 By Generic API
 
-* Generic API를 사용해서 메모리상에서 GenericRecord를 만들고 이를 GenericDatumWriter를 이용해서 serialization
+* JSON-format으로 schema 작성(avsc)
+* Generic API를 사용
+ * GenericRecord : object instantization
+ * GenericDatumWriter를 이용해서 serialization
 * DatumWriter는 schema가 있어야 serialization가능
 
 By Specific API
@@ -77,6 +90,10 @@ object container file format
 * block boundary가 명확하게 구분되므로 이를 바탕으로 Splittable & Compressible
 * DataFileWriter를 이용해서 만듬
 * avro datafile을 쓸 때는 Schema가 필요하나 읽을 때는 필요 없음. 왜나하면 파일에 내장됨
+* Read Access Pattern
+ * Usually sequential read
+ * Random access pattern support by sync marker
+
 
 
 ### Schema Resolution
