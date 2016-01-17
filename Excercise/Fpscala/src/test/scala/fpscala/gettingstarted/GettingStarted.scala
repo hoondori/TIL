@@ -79,5 +79,5 @@ class GettingStartedTest extends FlatSpec with Matchers {
 
   }
 
-
 }
+
