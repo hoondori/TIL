@@ -215,16 +215,107 @@ class datastructuresTest extends FlatSpec with Matchers {
 
   "Exercise 3.13" should "do" in {
 
+    /*Hard: Can you write foldLeft in terms of foldRight? How about the other way
+      around? Implementing foldRight via foldLeft is useful because it lets us implement
+    foldRight tail-recursively, which means it works even for large lists without overflowing
+      the stack.*/
+
+    // The implementation of `foldRight` in terms of `reverse` and `foldLeft` is a common trick
+    // for avoiding stack overflows when implementing a strict `foldRight` function
+
+    import List._
+    def reverse[A](l: List[A]): List[A] = foldLeft(l,List[A]())( (acc,h) => Cons(h, acc) )
+
+    def foldRight[A,B](l: List[A], z:B)(f: (A,B) => B): B =
+      foldLeft(reverse(l), z)((b,a) => f(a,b))
+
   }
 
   "Exercise 3.14" should "do" in {
+
+    /*Implement append in terms of either foldLeft or foldRight.*/
+    import List._
+    def append[A](l: List[A], z:List[A]): List[A] = foldRight(l,z)( (h,t) => Cons(h,t) )
+
+    append(List(1,2,3),List(4)) should be (List(1,2,3,4))
+    append(List(1,2,3),List(4,5)) should be (List(1,2,3,4,5))
+
 
   }
 
   "Exercise 3.15" should "do" in {
 
+/*
+    Hard: Write a function that concatenates a list of lists into a single list.
+    Its runtime should be linear in the total length of all lists. Try to use functions we have already defined
+*/
+    import List._
+    def append[A](l: List[A], z:List[A]): List[A] = foldRight(l,z)( (h,t) => Cons(h,t) )
+    def concat[A](l: List[List[A]]): List[A] = foldRight(l,Nil:List[A])( append(_,_) )
+
+    concat(List( List(1,2), List(3,4), List(5,6))) should be (List(1,2,3,4,5,6))
+
   }
 
+  "Exercise 3.16" should "do" in {
+
+    //import List._
+    def addOne(l: List[Int]): List[Int] = l match {
+      case Cons(x,xs) => Cons(x+1, addOne(xs))
+      case _ => l
+    }
+
+    import List._
+    def addOne2(l: List[Int]): List[Int] = foldRight(l,Nil:List[Int])((h,t) => Cons(h+1,t))
+
+    addOne(List(1,2)) should be (List(2,3))
+    addOne2(List(1,2)) should be (List(2,3))
+  }
+
+  "Exercise 3.17" should "do" in {
+
+    /*Write a function that turns each value in a List[Double] into a String. You can use
+    the expression d.toString to convert some d: Double to a String.*/
+
+    import List._
+    def convertString(l: List[Double]): List[String] = foldRight(l,Nil:List[String])((h,t) => Cons(h.toString, t))
+
+    convertString(List(3.14, 2.58)) should be (List("3.14", "2.58"))
+  }
+
+  "Exercise 3.18" should "do" in {
+
+    /*Write a function map that generalizes modifying each element in a list while maintaining
+    the structure of the list.
+    def map[A,B](as: List[A])(f: A => B): List[B]*/
+
+    import List._
+    def map[A,B](as: List[A])(f: A => B): List[B] =
+      foldRight(as, Nil:List[B])((h,t) => Cons(f(h),t))
+
+    map( List(1,2,3) )(x=>x*2) should be (List(2,4,6))
+  }
+
+  "Exercise 3.19" should "do" in {
+
+    /*Write a function filter that removes elements from a list unless they satisfy a given
+    predicate. Use it to remove all odd numbers from a List[Int].
+    def filter[A](as: List[A])(f: A => Boolean): List[A]*/
+
+    import List._
+    def filter[A](as: List[A])(f: A => Boolean): List[A] =
+      foldRight(as, Nil:List[A])((h,t) => if (f(h)) Cons(h,t) else t)
+
+    filter( List(1,2,3,4) )(x=> x%2==0) should be (List(2,4))
+  }
+
+  "Exercise 3.20" should "do" in {
+
+  }
+
+  "Exercise 3.21" should "do" in {
+
+  }
 }
 
 
