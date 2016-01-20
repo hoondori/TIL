@@ -376,15 +376,125 @@ class datastructuresTest extends FlatSpec with Matchers {
   }
 
   "Exercise 3.24" should "do" in {
-
+    // TODO
   }
 
   "Exercise 3.25" should "do" in {
+    /*Write a function size that counts the number of nodes
+      (leaves and branches) in a tree.*/
+
+    def size[A](t: Tree[A]): Int = t match {
+      case Leaf(_) => 1
+      case Branch(l,r) => 1 + size(l) + size(r)
+    }
+
+    size(Branch(Leaf(1), Leaf(2))) should be (3)
+    size(
+      Branch(
+        Leaf(1),
+        Branch(Leaf(1), Leaf(2))
+      )
+    ) should be (5)
 
   }
 
   "Exercise 3.26" should "do" in {
+    /*Write a function maximum that returns the maximum element in a Tree[Int]. (Note:
+      In Scala, you can use x.max(y) or x max y to compute the maximum of two integers x and y.)*/
 
+    def maximum(t: Tree[Int]): Int = t match {
+      case Leaf(v:Int) => v
+      case Branch(l,r) => maximum(l) max maximum(r)
+    }
+
+    maximum(
+      Branch(
+        Leaf(1),
+        Branch(Leaf(2), Leaf(3))
+      )
+    ) should be (3)
+
+  }
+
+  "Exercise 3.27" should "do" in {
+    /*Write a function depth that returns the maximum path length from the root of a tree to any leaf.*/
+
+    def depth[A](t: Tree[A]):Int = t match {
+      case Leaf(_) => 0
+      case Branch(l,r) => 1 + (depth(l) max depth(r))
+    }
+
+    depth(
+      Branch(
+        Leaf(1),
+        Branch(
+          Leaf(2),
+          Branch(
+            Leaf(3),
+            Leaf(4)
+          )
+        )
+      )
+    ) should be (3)
+  }
+
+  "Exercise 3.28" should "do" in {
+    /*Write a function map, analogous to the method of the same name on List, that modifies
+      each element in a tree with a given function.*/
+
+    def map[A,B](t: Tree[A])(f: A => B): Tree[B] = t match {
+      case Leaf(v) => Leaf(f(v))
+      case Branch(l,r) => Branch(map(l)(f),map(r)(f))
+    }
+
+    map(
+      Branch(
+        Leaf(1),
+        Branch(Leaf(2), Leaf(3))
+      )
+    )(v => v*2) should be (
+      Branch(
+        Leaf(2),
+        Branch(Leaf(4), Leaf(6))
+      )
+    )
+
+  }
+
+  "Exercise 3.29" should "do" in {
+    /*Generalize size, maximum, depth, and map, writing a new function fold that abstracts
+      over their similarities. Reimplement them in terms of this more general function. Can
+    you draw an analogy between this fold function and the left and right folds for List?*/
+
+    def size[A](t: Tree[A]): Int = t match {
+      case Leaf(_) => 1
+      case Branch(l,r) => 1 + size(l) + size(r)
+    }
+
+    def maximum(t: Tree[Int]): Int = t match {
+      case Leaf(v:Int) => v
+      case Branch(l,r) => maximum(l) max maximum(r)
+    }
+
+    def depth[A](t: Tree[A]):Int = t match {
+      case Leaf(_) => 0
+      case Branch(l,r) => 1 + (depth(l) max depth(r))
+    }
+
+    def map[A,B](t: Tree[A])(f: A => B): Tree[B] = t match {
+      case Leaf(v) => Leaf(f(v))
+      case Branch(l,r) => Branch(map(l)(f),map(r)(f))
+    }
+
+    def foldRight[A,B](as: List[A], z:B)(f: (A,B) => B): B = as match {
+      case Nil => z
+      case Cons(x,xs) => f(x, foldRight(xs,z)(f))
+    }
+
+    def fold[A,B](t: Tree[A])(l: A => B)(b: (B,B)=>B):B = t match {
+      case Leaf(v) => l(v)
+      case Branch(left,right) => b(fold(left)(l)(b),fold(right)(l)(b))
+    }
   }
 }
 
@@ -424,4 +534,8 @@ object List {
     if (as.isEmpty) Nil
     else Cons(as.head, apply(as.tail: _*))
 }
+
+sealed trait Tree[+A]
+case class Leaf[A](value: A) extends Tree[A]
+case class Branch[A](left: Tree[A], right: Tree[A]) extends Tree[A]
 
