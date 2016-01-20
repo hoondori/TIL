@@ -310,10 +310,80 @@ class datastructuresTest extends FlatSpec with Matchers {
   }
 
   "Exercise 3.20" should "do" in {
+    /*Write a function flatMap that works like map except that the function given
+    will return a list instead of a single result, and that list should be inserted into the final resulting list.
+    def flatMap[A,B](as: List[A])(f: A => List[B]): List[B]*/
+
+    import List._
+    def append[A](l: List[A], z:List[A]): List[A] = foldRight(l,z)( (h,t) => Cons(h,t) )
+    def flatMap[A,B](as: List[A])(f: A => List[B]): List[B] =
+      foldRight(as, List[B]())((h,t) => append(f(h),t))
+
+    flatMap(List(1,2,3))(i => List(i,i)) should be (List(1,1,2,2,3,3))
+
+    def concat[A](l: List[List[A]]): List[A] = foldRight(l,Nil:List[A])( append(_,_) )
+    def map[A,B](as: List[A])(f: A => B): List[B] = foldRight(as, Nil:List[B])((h,t) => Cons(f(h),t))
+    def flatMap2[A,B](as: List[A])(f: A => List[B]): List[B] =
+      concat( map(as)(f) )
+
+    flatMap2(List(1,2,3))(i => List(i,i)) should be (List(1,1,2,2,3,3))
 
   }
 
   "Exercise 3.21" should "do" in {
+
+    /*Use flatMap to implement filter*/
+
+    import List._
+    def append[A](l: List[A], z:List[A]): List[A] = foldRight(l,z)( (h,t) => Cons(h,t) )
+    def concat[A](l: List[List[A]]): List[A] = foldRight(l,Nil:List[A])( append(_,_) )
+    def map[A,B](as: List[A])(f: A => B): List[B] = foldRight(as, Nil:List[B])((h,t) => Cons(f(h),t))
+    def flatMap[A,B](as: List[A])(f: A => List[B]): List[B] =
+      concat( map(as)(f) )
+
+    def filter[A](as: List[A])(f: A => Boolean): List[A] =
+      flatMap(as)(a => if(f(a)) List(a) else Nil )
+
+    filter( List(1,2,3,4) )(x=> x%2==0) should be (List(2,4))
+
+  }
+
+  "Exercise 3.22" should "do" in {
+    /*Write a function that accepts two lists and constructs a new list by adding correspond- ing elements.
+    For example, List(1,2,3) and List(4,5,6) become List(5,7,9).*/
+
+    def addPairwise(a: List[Int], b: List[Int]): List[Int] = (a,b) match {
+      case (_,Nil) => Nil
+      case (Nil,_) => Nil
+      case (Cons(h1, t1), Cons(h2, t2)) => Cons( h1 + h2, addPairwise(t1,t2))
+    }
+
+    addPairwise(List(1,2,3),List(4,5,6)) should be (List(5,7,9))
+  }
+
+  "Exercise 3.23" should "do" in {
+    /*Generalize the function you just wrote so that it’s not specific to integers or addition.
+      Name your generalized function zipWith.*/
+
+    def zipWith[A](a: List[A], b:List[A])(f: (A,A) => A): List[A] = (a,b) match {
+      case (_,Nil) => Nil
+      case (Nil,_) => Nil
+      case (Cons(h1,t1), Cons(h2,t2)) => Cons( f(h1,h2), zipWith(t1,t2)(f) )
+    }
+
+    zipWith(List(1,2,3),List(4,5,6))( _ * _ ) should be (List(4,10,18))
+
+  }
+
+  "Exercise 3.24" should "do" in {
+
+  }
+
+  "Exercise 3.25" should "do" in {
+
+  }
+
+  "Exercise 3.26" should "do" in {
 
   }
 }
