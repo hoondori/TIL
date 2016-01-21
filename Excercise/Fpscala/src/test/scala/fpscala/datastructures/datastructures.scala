@@ -466,35 +466,23 @@ class datastructuresTest extends FlatSpec with Matchers {
       over their similarities. Reimplement them in terms of this more general function. Can
     you draw an analogy between this fold function and the left and right folds for List?*/
 
-    def size[A](t: Tree[A]): Int = t match {
-      case Leaf(_) => 1
-      case Branch(l,r) => 1 + size(l) + size(r)
-    }
-
-    def maximum(t: Tree[Int]): Int = t match {
-      case Leaf(v:Int) => v
-      case Branch(l,r) => maximum(l) max maximum(r)
-    }
-
-    def depth[A](t: Tree[A]):Int = t match {
-      case Leaf(_) => 0
-      case Branch(l,r) => 1 + (depth(l) max depth(r))
-    }
-
-    def map[A,B](t: Tree[A])(f: A => B): Tree[B] = t match {
-      case Leaf(v) => Leaf(f(v))
-      case Branch(l,r) => Branch(map(l)(f),map(r)(f))
-    }
-
-    def foldRight[A,B](as: List[A], z:B)(f: (A,B) => B): B = as match {
-      case Nil => z
-      case Cons(x,xs) => f(x, foldRight(xs,z)(f))
-    }
 
     def fold[A,B](t: Tree[A])(l: A => B)(b: (B,B)=>B):B = t match {
       case Leaf(v) => l(v)
       case Branch(left,right) => b(fold(left)(l)(b),fold(right)(l)(b))
     }
+
+    def size[A](t: Tree[A]): Int = fold(t)(v=>1)(1 + _+_)
+    def maximum(t: Tree[Int]): Int = fold(t)(v=>v)(_ max _)
+    def depth[A](t: Tree[Int]): Int = fold(t)(v=>0)( (l,r)=> (1 + l max r))
+    def map[A,B](t: Tree[A])(f: A => B): Tree[B] =
+      fold(t)(v=>Leaf(f(v)):Tree[B])((l,r) => Branch(l,r))
+
+    val t = Branch(Leaf(1), Leaf(2))
+    size(t) should be (3)
+    maximum(t) should be (2)
+    depth(t) should be (1)
+    map(t)(v => v*2) should be (Branch(Leaf(2), Leaf(4)))
   }
 }
 
