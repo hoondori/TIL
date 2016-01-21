@@ -5,7 +5,7 @@ import org.scalatest.{Matchers, FlatSpec}
 
 class Errorhandling extends FlatSpec with Matchers {
 
-  "Exercise 3.1" should "do" in {
+  "Exercise 4.1" should "do" in {
 
     Some(1) map (_*2) should be (Some(2))
     Some(1) getOrElse("a") should be (1)
@@ -18,6 +18,71 @@ class Errorhandling extends FlatSpec with Matchers {
     Some(1) filter2 { _ == 1 } should be (Some(1))
 
   }
+
+  "Exercise 4.2" should "do" in {
+
+    /*Implement the variance function in terms of flatMap. If the mean of a sequence is m,
+    the variance is the mean of math.pow(x - m, 2) for each element x in the sequence.
+    See the definition of variance on Wikipedia (http://mng.bz/0Qsr).
+    def variance(xs: Seq[Double]): Option[Double]*/
+
+
+  }
+
+  "Exercise 4.3" should "do" in {
+
+    /*Write a generic function map2 that combines two Option values using a binary function.
+    If either Option value is None, then the return value is too. Here is its signature:
+    def map2[A,B,C](a: Option[A], b: Option[B])(f: (A, B) => C): Option[C]*/
+
+    def map2[A,B,C](a: Option[A], b:Option[B])(f: (A,B) => C): Option[C] =
+      a flatMap ( aa => b map (bb => f(aa,bb)))
+
+    def map2_alternative[A,B,C](a: Option[A], b:Option[B])(f: (A,B) => C): Option[C] = (a,b) match {
+      case (None,_) => None
+      case (_,None) => None
+      case (Some(v1),Some(v2)) => Some(f(v1,v2))
+    }
+
+    def insuranceRateQuote( age: Int, tickets: Int): Double = age*2 + tickets*3
+    def parseInsuranceRateQuote( age: String, numberOfSpeedingTickets: String): Option[Double] = {
+      val optAge: Option[Int] = Try(age.toInt)
+      val optTickets : Option[Int] = Try(numberOfSpeedingTickets.toInt)
+      map2(optAge,optTickets)(insuranceRateQuote) // make opt-aware
+    }
+
+    parseInsuranceRateQuote("1","2") should be (Some(8.0))
+    parseInsuranceRateQuote("a","2") should be (None)
+
+  }
+
+  "Exercise 4.4" should "do" in {
+
+    /*Write a function sequence that combines a list of Options into one Option containing
+      a list of all the Some values in the original list. If the original list contains None even
+    once, the result of the function should be None; otherwise the result should be Some
+    with a list of all the values. Here is its signature:3
+    def sequence[A](a: List[Option[A]]): Option[List[A]]*/
+
+  }
+
+  "Exercise 4.5" should "do" in {
+
+  }
+
+  "Exercise 4.6" should "do" in {
+
+  }
+
+
+  // convert ordinary function to Option-adapted function
+  def lift[A,B](f: A => B): Option[A] => Option[B] = _ map f
+
+  // convert exception-based API to Option-oriented API
+  def Try[A](a: => A): Option[A] =
+    try Some(a)
+    catch { case e: Exception => None }
+
 }
 
 sealed trait Option[+A] {
@@ -48,5 +113,4 @@ sealed trait Option[+A] {
 }
 case class Some[+A](get: A) extends Option[A]
 case object None extends Option[Nothing]
-
 
