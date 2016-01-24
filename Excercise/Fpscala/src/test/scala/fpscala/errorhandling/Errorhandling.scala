@@ -36,7 +36,11 @@ class Errorhandling extends FlatSpec with Matchers {
     def map2[A,B,C](a: Option[A], b: Option[B])(f: (A, B) => C): Option[C]*/
 
     def map2[A,B,C](a: Option[A], b:Option[B])(f: (A,B) => C): Option[C] =
-      a flatMap ( aa => b map (bb => f(aa,bb)))
+      a flatMap { aa =>
+        b map { bb =>
+          f(aa,bb)
+        }
+      }
 
     def map2_alternative[A,B,C](a: Option[A], b:Option[B])(f: (A,B) => C): Option[C] = (a,b) match {
       case (None,_) => None
@@ -61,16 +65,61 @@ class Errorhandling extends FlatSpec with Matchers {
     /*Write a function sequence that combines a list of Options into one Option containing
       a list of all the Some values in the original list. If the original list contains None even
     once, the result of the function should be None; otherwise the result should be Some
-    with a list of all the values. Here is its signature:3
+    with a list of all the values. Here is its signature
     def sequence[A](a: List[Option[A]]): Option[List[A]]*/
 
+    import List._
+
+    def map2[A,B,C](a: Option[A], b:Option[B])(f: (A,B) => C): Option[C] =
+      a flatMap { aa =>
+        b map { bb =>
+          f(aa,bb)
+        }
+      }
+
+    def sequence[A](a: List[Option[A]]): Option[List[A]] =
+      a.foldRight[Option[List[A]]](Some(Nil))((x,y) => map2(x,y)(_ :: _))
+
+    def sequence_2[A](a: List[Option[A]]): Option[List[A]] = a match {
+      case Nil => Some(Nil)
+      case h::t =>
+        h flatMap { hh:A =>
+          sequence_2(t) map {
+            tt => hh::tt
+          }
+        }
+    }
   }
 
   "Exercise 4.5" should "do" in {
 
+    /*Implement this function. It’s straightforward to do using map and sequence,
+    but try for a more efficient implementation that only looks at the list once. In fact, implement sequence in terms of traverse*/
+
+
+    def map2[A,B,C](a: Option[A], b:Option[B])(f: (A,B) => C): Option[C] =
+      a flatMap { aa =>
+        b map { bb =>
+          f(aa,bb)
+        }
+      }
+
+    def sequence[A](a: List[Option[A]]): Option[List[A]] =
+      a.foldRight[Option[List[A]]](Some(Nil))((x,y) => map2(x,y)(_ :: _))
+
+    def traverse_naive[A, B](a: List[A])(f: A => Option[B]): Option[List[B]] =
+      sequence( a map (i => f(i) ) )
+
+    def traverse[A,B](a: List[A])(f: A => Option[B]): Option[List[B]] =
+      a.foldRight[Option[List[B]]](Some(List[B]()))((x,y) => f(x)::y)
+
   }
 
   "Exercise 4.6" should "do" in {
+
+  }
+
+  "Exercise 4.7" should "do" in {
 
   }
 
