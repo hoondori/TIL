@@ -109,23 +109,45 @@ class lazinessTest extends FlatSpec with Matchers {
 
   "Exercise 5.8" should "do" in {
 
+    /*Generalize ones slightly to the function constant, which returns an infinite Stream of a given value.
+    def constant[A](a: A): Stream[A]*/
+
+    Stream.constant(3).take(4).toList should be (List(3,3,3,3))
+
   }
 
   "Exercise 5.9" should "do" in {
 
-  }
+    /*Write a function that generates an infinite stream of integers,
+    starting from n, then n + 1, n + 2, and so on.
+    def from(n: Int): Stream[Int]*/
 
-  "Exercise 5.9" should "do" in {
+    Stream.from(1).take(4).toList should be (List(1,2,3,4))
 
   }
 
   "Exercise 5.10" should "do" in {
 
+    /*Write a function fibs that generates the infinite stream
+    of Fibonacci numbers: 0, 1, 1, 2, 3, 5, 8, and so on.*/
+
+    Stream.fibs().take(6).toList should be (List(0,1,1,2,3,5))
+
   }
+
   "Exercise 5.11" should "do" in {
+
+    /*Write a more general stream-building function called unfold. It takes an initial state,
+    and a function for producing both the next state and the next value in the generated stream.
+    def unfold[A, S](z: S)(f: S => Option[(A, S)]): Stream[A]*/
+
+
 
   }
   "Exercise 5.12" should "do" in {
+
+  }
+  "Exercise 5.13" should "do" in {
 
   }
 }
@@ -203,6 +225,7 @@ sealed trait Stream[+A] {
   def find(p: A => Boolean): Option[A] =
     filter(p).headOption
 
+
 }
 case object Empty extends Stream[Nothing]
 case class Cons[+A](h: () => A, t: () => Stream[A]) extends Stream[A]
@@ -220,6 +243,28 @@ object Stream {
   def apply[A](as: A*): Stream[A] =
     if (as.isEmpty) empty else cons(as.head, apply(as.tail: _*))
 
+  // This is more efficient than `cons(a, constant(a))` since it's just
+  // one object referencing itself.
+  def constant[A](a: A): Stream[A] = {
+    lazy val tail: Stream[A] = Cons(() => a, () => tail)
+    tail
+  }
 
+  def constant_1[A](a: A): Stream[A] = cons(a, constant(a))
 
+  def from(n: Int): Stream[Int] = cons(n, from(n+1))
+
+  def fibs(): Stream[Int] = {
+
+    def go(f0:Int, f1:Int): Stream[Int] = cons(f0, go(f1,f0+f1))
+    go(0,1)
+  }
+
+  def unfold[A,S](z: S)(f: S => Option[(A,S)]): Stream[A] = {
+
+    f(z) match {
+      case None => empty
+      case Some((a,s)) => cons(a, unfold(s)(f))
+    }
+  }
 }
