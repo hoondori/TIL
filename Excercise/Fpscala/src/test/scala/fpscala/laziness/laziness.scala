@@ -84,17 +84,48 @@ class lazinessTest extends FlatSpec with Matchers {
 
   "Exercise 5.5" should "do" in {
 
+    /*Use foldRight to implement takeWhile.*/
+
+    Stream(1,2,3,4).takeWhile_byFoldRight( _ < 3).toList should be (List(1,2))
   }
 
   "Exercise 5.6" should "do" in {
+
+    /*Hard: Implement headOption using foldRight*/
+
 
   }
 
   "Exercise 5.7" should "do" in {
 
+    /*Implement map, filter, append, and flatMap using foldRight.
+    The append method should be non-strict in its argument*/
+
+    Stream(1,2,3,4).map( _ * 2 ).toList should be (List(2,4,6,8))
+    Stream(1,2,3,4).flatMap( x => Stream(x*2) ).toList should be (List(2,4,6,8))
+    Stream(1,2,3,4).filter( _ < 3).toList should be (List(1,2))
+
   }
 
   "Exercise 5.8" should "do" in {
+
+  }
+
+  "Exercise 5.9" should "do" in {
+
+  }
+
+  "Exercise 5.9" should "do" in {
+
+  }
+
+  "Exercise 5.10" should "do" in {
+
+  }
+  "Exercise 5.11" should "do" in {
+
+  }
+  "Exercise 5.12" should "do" in {
 
   }
 }
@@ -145,9 +176,33 @@ sealed trait Stream[+A] {
     case _ => z
   }
 
-  def exists(p: A => Boolean): Boolean = foldRight(false)((a,b) => p(a) || b )
+  def exists(p: A => Boolean): Boolean = foldRight(false)((h,t) => p(h) || t )
 
-  def forAll(p: A => Boolean): Boolean = foldRight(true)((a,b) => p(a) && b )
+  def forAll(p: A => Boolean): Boolean = foldRight(true)((h,t) => p(h) && t )
+
+  def takeWhile_byFoldRight(p: A => Boolean): Stream[A] =
+    foldRight(empty[A])((h,t) => if(p(h)) cons(h, t) else empty[A])
+
+  def headOption: Option[A] =
+    foldRight(None: Option[A])((h,_) => Some(h))
+
+  def map[B](f: A => B): Stream[B] = {
+    foldRight(empty[B])((h,t) => cons(f(h),t))
+  }
+
+  def filter(p: A => Boolean): Stream[A] = {
+    foldRight(empty[A])((h,t) => if (p(h)) cons(h,t) else t )
+  }
+
+  def append[B>:A](z: => Stream[B]): Stream[B] =
+    foldRight(z)((h,t) => cons(h,t))
+
+  def flatMap[B](f: A => Stream[B]): Stream[B] =
+    foldRight(empty[B])((h,t) => f(h).append(t))
+
+  def find(p: A => Boolean): Option[A] =
+    filter(p).headOption
+
 }
 case object Empty extends Stream[Nothing]
 case class Cons[+A](h: () => A, t: () => Stream[A]) extends Stream[A]
