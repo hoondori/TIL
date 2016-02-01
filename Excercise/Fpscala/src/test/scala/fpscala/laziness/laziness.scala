@@ -146,6 +146,10 @@ class lazinessTest extends FlatSpec with Matchers {
   }
   "Exercise 5.12" should "do" in {
 
+    /*Write fibs, from, constant, and ones in terms of unfold*/
+
+    Stream.fibs_byUnfold.take(6).toList should be (List(0,1,1,2,3,5))
+
   }
   "Exercise 5.13" should "do" in {
 
@@ -267,4 +271,10 @@ object Stream {
       case Some((a,s)) => cons(a, unfold(s)(f))
     }
   }
+
+  val fibs_byUnfold
+    = unfold((0,1)) { case (f0,f1) => Some((f0,(f1,f0+f1))) }
+
+  //def constant[A](a: A): Stream[A] = unfold(a)( s => Some(a,s) )
+
 }
