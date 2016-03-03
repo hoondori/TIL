@@ -34,8 +34,15 @@ class Ch1_Introduction extends FlatSpec with Matchers {
       }
     }
 
-
     def fuse_alt[A,B](a: Option[A], b:Option[B]): Option[(A,B)] = {
+      a flatMap { aElem =>
+        b map { bElem =>
+          (aElem,bElem)
+        }
+      }
+    }
+
+    def fuse_alt2[A,B](a: Option[A], b:Option[B]): Option[(A,B)] = {
 
       (a,b) match {
         case (Some(x),Some(y)) => Option((x,y))
@@ -55,6 +62,11 @@ class Ch1_Introduction extends FlatSpec with Matchers {
     fuse_alt(None,Option("2")) should be (None)
     fuse_alt(None,None) should be (None)
 
+    fuse_alt2(Option(1),Option("2")) should be (Some((1,"2")))
+    fuse_alt2(Option(1),None) should be (None)
+    fuse_alt2(None,Option("2")) should be (None)
+    fuse_alt2(None,None) should be (None)
+
   }
 
   "Exercise 1.3" should "do" in {
@@ -68,7 +80,7 @@ class Ch1_Introduction extends FlatSpec with Matchers {
         try {
           pred(x)
         } catch {
-          case _: Exception => false
+          case _: Exception => false    // fast decision course
         }
       }
     }
@@ -88,26 +100,19 @@ class Ch1_Introduction extends FlatSpec with Matchers {
 
   "Exercise 1.4" should "do" in {
 
-    /*Implement a permutations function, which, given a string, returns a sequence of strings that
-      are lexicographic permutations of the input string:
-    def permutations(x: String): Seq[String]*/
+    /* Modify the Pair class from this chapter so that it can be used in a pattern match.
+    *
+    *  class Pair[P, Q](val first: P, val second: Q)
+    * */
 
-//    def permutations(x: String): Seq[String] = {
-//
-//      val chars = x.toCharArray.sorted
-//      chars foreach println _
-//
-//      for { char <- chars } {
-//
-//      }
-//
-//
-//
-//    }
+    case class Pair[P, Q](val first: P, val second: Q)
 
-
-    //permutations("bac") should be (Seq("abc", "acb", "bac", "bca", "cab", "cba"))
-
-
+    Pair(3,1.3) match {
+      case Pair(x,y) => {
+        x should be > 2
+        y should be > 1.2
+      }
+      case _ =>
+    }
   }
 }
