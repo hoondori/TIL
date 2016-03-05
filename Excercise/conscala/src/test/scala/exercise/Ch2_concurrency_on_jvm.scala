@@ -364,16 +364,7 @@ class Ch2_concurrency_on_jvm extends FlatSpec with Matchers {
     println(s"results: ${pages.map(_.position)}")
 
   }
-
-  // Deadlocks
-  "Text 15" should "do" in {
-
-    /* How to avoid deadlock - make access order of resources */
-
-
-  }
-
-
+  
   "Exercise 2.1" should "do" in {
 
     /*Implement a parallel method, which takes two computation blocks a and b,
