@@ -364,27 +364,212 @@ class Ch2_concurrency_on_jvm extends FlatSpec with Matchers {
     println(s"results: ${pages.map(_.position)}")
 
   }
-  
+
   "Exercise 2.1" should "do" in {
 
     /*Implement a parallel method, which takes two computation blocks a and b,
-    and starts each of them in a new thread*/
+    and starts each of them in a new thread.
+    The method must return a tuple with the result values of both the computations*/
 
+    case class RetA[A](a: A)
+
+    def parallel[A,B]( a: => A, b: => B): (A,B) = {
+      var ret1: A = null.asInstanceOf[A]
+      var ret2: B = null.asInstanceOf[B]
+      val t1 = thread { ret1 = a }
+      val t2 = thread { ret2 = b }
+      t1.join(); t2.join()
+      (ret1,ret2)
+    }
+
+    parallel[Int,Double]( 1+1, 1.0+2.1 ) should be ((2,3.1))
 
   }
 
 
   "Exercise 2.2" should "do" in {
-    Future
+
+    /*Implement a periodically method, which takes a time interval duration
+      specified in milliseconds, and a computation block b. The method starts a
+      thread that executes the computation block b every duration milliseconds.
+    It should have the following signature:
+    def periodically(duration: Long)(b: =>Unit): Unit*/
+
+    def periodically(duration: Long)(b: => Unit): Unit = {
+      val t = thread {
+        while (true) {
+          b
+          Thread.sleep(duration)
+        }
+      }
+      t.join()
+    }
+
+    periodically(3000) { println("babo") }
+
+
+
   }
 
 
   "Exercise 2.3" should "do" in {
 
+    /*Implement a SyncVar class with the following interface:
+    class SyncVar[T] {
+      def get(): T = ???
+      def put(x: T): Unit = ???
+    }*/
+
+    class SyncVar[T] {
+      var empty:Boolean = true
+      var innerVal = null.asInstanceOf[T]
+
+      def get(): T = this.synchronized {
+        empty match {
+          case true => throw new RuntimeException("syncvar is empty")
+          case false => {
+            empty = true
+            val copy = innerVal
+            innerVal = null.asInstanceOf[T]
+            copy
+          }
+        }
+      }
+      def put(x: T): Unit = this.synchronized {
+        empty match {
+          case false =>  throw new RuntimeException("syncvar is not empty")
+          case true => {
+            innerVal = x
+            empty = false
+          }
+        }
+      }
+    }
   }
 
 
   "Exercise 2.4" should "do" in {
+
+    /*The SyncVar object from the previous exercise can be cumbersome to use,
+    due to exceptions when the SyncVar object is in an invalid state. Implement
+    a pair of methods isEmpty and nonEmpty on the SyncVar object. Then,
+    implement a producer thread that transfers a range of numbers 0 until 15
+    to the consumer thread that prints them.*/
+
+    class SyncVar[T] {
+      var empty:Boolean = true
+      var innerVal = null.asInstanceOf[T]
+
+      def get(): T = this.synchronized {
+        empty match {
+          case true => throw new RuntimeException("syncvar is empty")
+          case false => {
+            empty = true
+            val copy = innerVal
+            innerVal = null.asInstanceOf[T]
+            copy
+          }
+        }
+      }
+
+      def put(x: T): Unit = this.synchronized {
+        empty match {
+          case false =>  throw new RuntimeException("syncvar is not empty")
+          case true => {
+            innerVal = x
+            empty = false
+          }
+        }
+      }
+
+      def isEmpty(): Boolean = this.synchronized { this.empty }
+
+      def nonEmpty(): Boolean = this.synchronized{ ! this.empty }
+    }
+
+    val mySyncVar = new SyncVar[Int]()
+    val producer = thread {
+      for(i <- 0 until 15) {
+        while(mySyncVar.nonEmpty) {}
+        mySyncVar.put(i)
+      }
+    }
+    val consumer = thread {
+      for(i <- 0 until 15) {
+        while(mySyncVar.isEmpty) {}
+        println( mySyncVar.get )
+      }
+    }
+    producer.join()
+    consumer.join()
+  }
+
+
+  "Exercise 2.5" should "do" in {
+
+    /*Using the isEmpty and nonEmpty pair of methods from the previous exercise
+      requires busy-waiting. Add the following methods to the SyncVar class:
+    def getWait(): T
+    def putWait(x: T): Unit*/
+
+    class SyncVar[T] {
+      var empty:Boolean = true
+      var innerVal = null.asInstanceOf[T]
+
+      def getWait(): T = this.synchronized {
+        while(empty)
+          this.wait()
+
+        // tell it is empty now
+        empty = true
+        this.notify()
+
+        innerVal
+      }
+      def putWait(x: T): Unit = this.synchronized {
+        while(empty == false) this.wait()
+
+        innerVal = x
+
+        // tell it is not-empty anymore
+        empty = false
+        this.notify()
+      }
+    }
+
+    val mySyncVar = new SyncVar[Int]()
+    val producer = thread {
+      for(i <- 0 until 15) {
+        mySyncVar.putWait(i)
+      }
+    }
+    val consumer = thread {
+      for(i <- 0 until 15) {
+        println( mySyncVar.getWait )
+      }
+    }
+    producer.join()
+    consumer.join()
+
+
+  }
+
+
+  "Exercise 2.6" should "do" in {
+
+/*
+    A SyncVar object can hold at most one value at a time. Implement a
+      SyncQueue class, which has the same interface as the SyncVar class, but can
+      hold at most n values. The parameter n is specified in the constructor of the
+      SyncQueue class
+*/
+
+
+    
+  }
+
+
+  "Exercise 2.7" should "do" in {
 
   }
 
