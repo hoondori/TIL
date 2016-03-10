@@ -2,6 +2,7 @@ package exercise
 
 import org.scalatest.{Matchers, FlatSpec}
 
+import scala.collection.mutable.ArrayBuffer
 import scala.concurrent.Future
 
 class Ch2_concurrency_on_jvm extends FlatSpec with Matchers {
@@ -564,14 +565,168 @@ class Ch2_concurrency_on_jvm extends FlatSpec with Matchers {
       SyncQueue class
 */
 
+    class SyncQueue[T](max: Int) {
+      var queue = new scala.collection.mutable.Queue[T]()
 
-    
+      def getWait(): T = this.synchronized {
+        while(queue.isEmpty) this.wait()
+
+        val retVal = queue.dequeue()
+
+        this.notify()
+
+        retVal
+
+      }
+      def putWait(x: T): Unit = this.synchronized {
+        while(queue.length == max) this.wait()
+
+        queue += x
+
+        this.notify()
+      }
+    }
+
+    val mySyncQ = new SyncQueue[Int](2)
+    val producer = thread {
+      for(i <- 0 until 15) {
+        mySyncQ.putWait(i)
+      }
+    }
+    val consumer = thread {
+      for(i <- 0 until 15) {
+        println( mySyncQ.getWait )
+      }
+    }
+    producer.join()
+    consumer.join()
+
+
   }
+
+
+
 
 
   "Exercise 2.7" should "do" in {
 
+    /*The send method in the Deadlocks section was used to transfer money
+      between the two accounts. The sendAll method takes a set accounts of bank
+    accounts and a target bank account, and transfers all the money from every
+    account in accounts to the target bank account. The sendAll method has
+      the following signature:
+    def sendAll(accounts: Set[Account], target: Account): Unit
+    Implement the sendAll method and ensure that a deadlock cannot occur.*/
+
+
+    var uidCount = 0
+    def getUniqueId() = this.synchronized {
+      val freshUid = uidCount + 1
+      uidCount = freshUid
+      freshUid
+    }
+
+    class Account(val name: String, var money: Int) {
+      val uid = getUniqueId()
+    }
+
+    def sendAll(accounts: Set[Account], target:Account): Unit = {
+
+      def adjust(source: Account, sink: Account): Unit = {
+        sink.synchronized {
+          sink.money += source.money
+          source.money = 0
+        }
+      }
+
+      val threads = accounts map { account =>
+        thread {
+          adjust(account, target)
+        }
+      }
+
+      threads foreach { _.join }
+
+    }
+
+    val accounts = Set(
+      new Account("A", 1000),
+      new Account("B", 2000),
+      new Account("C", 3000)
+    )
+    val target = new Account("ME", 0)
+    sendAll(accounts, target)
+
+    println(s"target = ${target.money}")
+    accounts foreach { account => println(s"name = ${account.name} money = ${account.money}") }
+
+    target.money should be (6000)
+
+
   }
 
+
+  "Exercise 2.8" should "do" in {
+
+    /*Recall the asynchronous method from the Guarded blocks section. This
+    method stores the tasks in a First In First Out (FIFO) queue; before a
+      submitted task is executed, all the previously submitted tasks need to be
+      executed. In some cases, we want to assign priorities to tasks so that a
+      high-priority task can execute as soon as it is submitted to the task pool.
+    Implement a PriorityTaskPool class that has the asynchronous method
+    with the following signature:
+    def asynchronous(priority: Int)(task: =>Unit): Unit
+    A single worker thread picks tasks submitted to the pool and executes them.
+      Whenever the worker thread picks a new task from the pool for execution,
+    that task must have the highest priority in the pool.*/
+
+    import scala.collection._
+
+    val tasks = mutable.PriorityQueue.empty[(Int,() => Unit)](
+      Ordering.by((_:(Int,() => Unit))._1)
+    )
+
+    val worker = new Thread {
+      setDaemon(true)
+      def poll(): () => Unit = tasks.synchronized {
+        while(tasks.isEmpty) tasks.wait()
+        tasks.dequeue()._2
+        //if (tasks.nonEmpty) Some(tasks.dequeue()) else None
+      }
+      override def run() = while(true) {
+        val task = poll()
+        task()
+      }
+    }
+
+    worker.setName("Worker")
+    worker.start()
+
+    def asynchronous(priority: Int)(task: => Unit) = tasks.synchronized {
+      println( s"enqueued p=${priority}")
+      tasks.enqueue((priority,() => task))
+      tasks.notify()
+    }
+    for { i <- 0 until 100 } {
+      val start = 100
+      val end   = 200
+      val rnd = new scala.util.Random
+
+      val rndVal = ( start + rnd.nextInt( (end - start) + 1 ) )
+
+      asynchronous(rndVal) { println(s"hello ${rndVal}"); Thread.sleep(10) }
+    }
+    Thread.sleep(2000)
+
+
+  }
+
+  "Exercise 2.9" should "do" in {
+
+  }
+
+  "Exercise 2.10" should "do" in {
+
+  }
 
 }
