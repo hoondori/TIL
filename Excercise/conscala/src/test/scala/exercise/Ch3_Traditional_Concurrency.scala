@@ -1,8 +1,10 @@
 package exercise
 
+import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.atomic.{AtomicReference, AtomicBoolean}
 import org.scalatest.{Matchers, FlatSpec}
 import scala.annotation.tailrec
+import scala.collection.concurrent.TrieMap
 import scala.concurrent.ExecutionContext
 
 
@@ -198,5 +200,159 @@ class Ch3_Traditional_Concurrency extends FlatSpec with Matchers {
 
   }
 
+  // Concurrent collections
+  "Text 11" should "do" in {
+
+    import scala.collection.mutable.ArrayBuffer
+
+    // standard collection does not provide any synchronization
+    val buffer = ArrayBuffer[Int]()
+    def asyncAdd(numbers: Seq[Int]) = execute {
+      buffer ++= numbers
+      println(s"buffer = $buffer")
+    }
+    asyncAdd(0 until 10)
+    asyncAdd(10 until 20)
+    Thread.sleep(500)
+
+  }
+
+  // Concurrent collections
+  "Text 12" should "do" in {
+
+    // atomic variable based concurrent collection
+    // but leading to scalability problems
+    class AtomicBuffer[T] {
+      private val buffer = new AtomicReference[List[T]](Nil)
+      def +=(x: T): Unit = {
+        val xs = buffer.get
+        val nxs = x::xs
+        if(!buffer.compareAndSet(xs,nxs)) this += x
+      }
+    }
+
+    val buf = new AtomicBuffer[Int]
+    execute { for ( i <- 1 to 10 ) buf += i }
+    execute { for ( i <- 11 to 20 ) buf += i }
+
+    Thread.sleep(500)
+
+  }
+
+  // Concurrent collections
+  "Text 13" should "do" in {
+    import scala.collection.mutable.ArrayBuffer
+
+    // standard collection with synchronized
+    // but leading to scalability problems
+    val buffer = ArrayBuffer[Int]()
+    def asyncAdd(numbers: Seq[Int]) = execute {
+      buffer.synchronized {
+        buffer ++= numbers
+        println(s"buffer = $buffer")
+      }
+    }
+    asyncAdd(0 until 10)
+    asyncAdd(10 until 20)
+    Thread.sleep(500)
+  }
+
+
+  // concurrent queues
+  "Text 14" should "do" in {
+    // linked-list based blocking queue
+    // as a producer-consumer pattern
+    import java.util.concurrent.LinkedBlockingQueue
+
+    val messages = new LinkedBlockingQueue[String]()
+    val logger = new Thread {
+      setDaemon(true)
+      override def run() = while(true) println(messages.take())
+    } // message consumer
+    logger.start()
+    def logMessage(msg: String): Unit = messages.offer(msg)
+
+    for (i <- 1 to 100) logMessage(s"$i")
+
+  }
+
+  // concurrent queues
+  "Text 15" should "do" in {
+    // wealkly consistent iterators
+    import java.util.concurrent.LinkedBlockingQueue
+
+    val queue = new LinkedBlockingQueue[String]()
+    for (i <- 1 to 5500) queue.offer(i.toString)
+    execute {
+      val it = queue.iterator()
+      while(it.hasNext) println(it.next)
+    }
+    for( i <- 1 to 5495) queue.poll()
+    Thread.sleep(1000)
+  }
+
+
+  // concurrent sets and maps
+  "Text 16" should "do" in {
+
+    import scala.collection.JavaConversions._
+
+    // weak consistent iterator by standard concurrent hash map
+    val names = new ConcurrentHashMap[String, Int]()
+    names("Johonny") =0; names("Jane") = 0; names("Jack") = 0
+    execute { for( n <- 0 until 10) names(s"Johnny $n") = n }
+    execute {
+      for( n <- names ) println(s"name: $n")
+    }
+    Thread.sleep(1000)
+
+
+  }
+
+  // concurrent sets and maps
+  "Text 17" should "do" in {
+    // strong consistent iterator by TriMap
+    val names = new TrieMap[String,Int]()
+    names("Janiece") = 0; names("Jackie") = 0; names("Jill") = 0;
+    execute { for( n <- 10 until 100) names(s"John $n") = n }
+    execute {
+      println("snapshot time!")
+      for( n <- names.map(_._1).toSeq.sorted) println(s"name: $n")
+    }
+    Thread.sleep(1000)
+  }
+
+  // creating and handling processes
+  "Text 18" should "do" in {
+    import scala.sys.process._
+    val command = "ls"
+    val exitcode = command.!
+    println(s"command exited with status $exitcode")
+  }
+
+  // creating and handling processes
+  "Text 19" should "do" in {
+    import scala.sys.process._
+    val command = s"wc build.sbt"
+    val output = command.!!
+    println( output.trim.split(" ").head.toInt )
+
+  }
+
+  // creating and handling processes
+  "Text 20" should "do" in {
+    import scala.sys.process._
+    val lsProcess = "ls -R /".run()  // async run
+    lsProcess.exitValue() // like await.ready
+  }
+
+  // creating and handling processes
+  "Text 21" should "do" in {
+    import scala.sys.process._
+    val lsProcess = "ls -R /".run()  // async run
+    Thread.sleep(1000)
+    println("Timeout - killing ls!")
+    lsProcess.destroy()
+  }
 
 }
