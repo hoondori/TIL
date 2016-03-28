@@ -1,5 +1,7 @@
 package exercise
 
+import java.util.TimerTask
+
 import org.scalatest.{Matchers, FlatSpec}
 import scala.concurrent._
 import ExecutionContext.Implicits.global
@@ -29,7 +31,7 @@ class Ch4_Future extends FlatSpec with Matchers {
       val f = Source.fromFile("build.sbt")
       try f.getLines().mkString("\n") finally f.close()
     }
-    println(s"started reading the build file asynchronosly")
+    println(s"started reading the build file asynchronously")
     println(s"status ${buildFile.isCompleted}")
     Thread.sleep(250)
     println(s"status ${buildFile.isCompleted}")
@@ -179,13 +181,134 @@ class Ch4_Future extends FlatSpec with Matchers {
 
   }
 
-  // Future combination
+  // Converting callback-based APIs
   "Text 11" should "do" in {
+
+    import org.apache.commons.io.monitor._
+    import java.io.File
+
+    def fileCreated(directory: String): Future[String] = {
+      val p = Promise[String]
+      val fileMonitor = new FileAlterationMonitor(1000)
+      val observer = new FileAlterationObserver(directory)
+      val listener = new FileAlterationListenerAdaptor {
+        override def onFileCreate(file: File): Unit =  {
+          try p.trySuccess(file.getName) finally fileMonitor.stop()
+        }
+      }
+      observer.addListener(listener)
+      fileMonitor.addObserver(observer)
+      fileMonitor.start()
+      p.future
+    }
+
+    fileCreated(".") foreach {
+      case filename => println(s"Detected new file '$filename'")
+    }
+
+
 
   }
 
-  // Future combination
+  // Converting callback-based APIs
   "Text 12" should "do" in {
+
+    // timeout
+    import java.util.Timer
+    val timer = new Timer(true)
+
+    def timeout(t: Long): Future[Unit] = {
+      val p = Promise[Unit]
+      timer.schedule( new TimerTask {
+        def run() = {
+          p success ()
+          timer.cancel()
+        }
+      }, t)
+      p.future
+    }
+
+    timeout(1000) foreach { case _ => println("Timed out")}
+    Thread.sleep(2000)
+  }
+
+  // Extending the future API
+  "Text 13" should "do" in {
+    // with implicit class
+
+    implicit class FutureOps[T](val self: Future[T]) {
+
+      // The resulting future is completed with the value of one of the input futures depending on the execution schedule.
+      def or(that: Future[T]): Future[T] = {
+        val p = Promise[T]
+        self onComplete { case x => p tryComplete x }
+        that onComplete { case y => p tryComplete y }
+        p.future
+      }
+    }
+
+    Future {println("A")} or Future {println("B")}
+    Thread.sleep(2000)
+  }
+
+  // Cancellation of asynchronous computation
+  "Text 14" should "do" in {
+    type Cancellable[T] = (Promise[Unit],Future[T])
+
+    def cancellable[T](b: Future[Unit] => T): Cancellable[T] = {
+      val cancel = Promise[Unit]
+      val f = Future {
+        val r: T = b(cancel.future)
+        if(!cancel.tryFailure(new Exception))
+          throw new CancellationException
+        r
+      }
+      (cancel,f)
+    }
+
+    val (cancel, value) = cancellable { cancel =>
+      var i = 0
+      while(i < 5) {
+        if(cancel.isCompleted) {
+          println("cancel is ordered")
+          throw new CancellationException("wook")
+        }
+        Thread.sleep(500)
+        println(s"$i: working")
+        i += 1
+      }
+      "resulting value"
+    }
+
+    Thread.sleep(1500)
+    cancel trySuccess()
+    println("computation cancelled!!")
+    Thread.sleep(2000)
+    println(value.value)
+
+
+
+  }
+
+  // Awaiting futures
+  "Text 15" should "do" in {
+
+    // create starvation...
+
+    import scala.concurrent.duration._
+    val startTime = System.nanoTime
+    val futures = for (_ <- 0 until 16) yield Future {
+      Thread.sleep(1000)
+      val endTime = System.nanoTime
+      println(s"Elpased time = ${(endTime - startTime) / 1000000} ms")
+    }
+    for (f <- futures) Await.ready(f, Duration.Inf)
+    val endTime = System.nanoTime
+    println(s"Total time = ${(endTime - startTime) / 1000000} ms")
+    println(s"Total CPUs = ${Runtime.getRuntime.availableProcessors}")
+  }
+
+  "Text 16" should "do" in {
 
   }
 }
