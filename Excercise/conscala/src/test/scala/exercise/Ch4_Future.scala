@@ -308,7 +308,70 @@ class Ch4_Future extends FlatSpec with Matchers {
     println(s"Total CPUs = ${Runtime.getRuntime.availableProcessors}")
   }
 
+  // Scala async library
   "Text 16" should "do" in {
 
+    import scala.async.Async.{async,await}
+
+    def delay(n: Int): Future[Unit] = async {
+      blocking { Thread.sleep(n*1000) }
+    }
+
+    def countdown(n: Int)(f: Int => Unit): Future[Unit] = async {
+      var i = n
+      while (i>0) {
+        f(i)
+        await { delay(1) }
+        i -= 1
+      }
+    }
+
+    countdown(3) { n => println(s"T-minus $n seconds") } foreach {
+      case _ => println(s"This program is over!")
+    }
+    Thread.sleep(4000)
+
+  }
+
+  // scalaz-concurrent
+  "Text 17" should "do" in {
+
+    // pull semantics
+    import scalaz.concurrent._
+    val tombola = Future {
+      scala.util.Random.shuffle((0 until 10000).toVector)
+    }
+    tombola.runAsync { numbers =>
+      println(s"And the winner is ${numbers.head}")
+    }
+    tombola.runAsync { numbers =>
+      println(s".....ahm, winner is ${numbers.head}")
+    }
+
+    // push semantics
+    val tombola2 = Future {
+      scala.util.Random.shuffle((0 until 10000).toVector)
+    } start
+
+    tombola2.runAsync { numbers =>
+        println(s"And the winner is ${numbers.head}")
+      }
+    tombola2.runAsync { numbers =>
+      println(s".....ahm, winner is ${numbers.head}")
+    }
+
+  }
+
+  "Exercise 4.1" should "do" in {
+
+    /*Implement a command-line program that asks the user to input a URL of
+    some website, and displays the HTML of that website. Between the time that
+      the user hits ENTER and the time that the HTML is retrieved, the program
+      should repetitively print a . to the standard output every 50 milliseconds,
+    with a two seconds timeout. Use only futures and promises, and avoid the
+    synchronization primitives from the previous chapters. You may reuse the
+      timeout method defined in this chapter*/
+
+    
   }
 }
