@@ -71,3 +71,49 @@
  * choose next one and test whether it is accepted or rejected
  * those accepted series turn out to be ergodic process
  ![](../images/benjio_17/11.png)
+
+
+## Markov chain monte carlo Methods
+
+* hard to sample from true dist p, or importance sampling dist q
+* Instead, we need to approximately sample from p by markov chain
+* precondition is of no zero-probability
+ * or no zero-energy in energy-based model
+* Why markov chain?
+ * In EBM, in undirected graph, sampling is difficult due to intractable cases
+ * In acyclic, in directed graph, it is quite easy to sample due to tractable cases
+* what internals in markov chains ?
+ * pdf of states eventually converges to equilibrium distribution
+  * all eigenvalues decay to zero except single 1 eigenvalue
+  * rate of convergence is related to the second largest eigenvalue decay
+  * is called "burning in"
+  * no theory yet for deciding whether equilibrium achieved or not
+
+## Gibbs sampling
+* http://www.cs.cmu.edu/~tom/10-702/GibbsAndMCMCsampling.pdf
+* as a variation of EM Algorithms
+* if bivarate x,y, sample x1 from y0, then y1 from x1, and so on.
+ * converges to true dist p(x)
+
+![](../images/benjio_17/12.png)
+![](../images/benjio_17/13.png)
+
+* select one variable x and sampling it from pmodel conditioned on its neighbors in the undirected graph defined in energy-based model
+* usually do not use metropolis-hastings algorithm in deep learning
+
+## The challenge of mixing between separated modes
+
+* mix mean samples from almost all areas of sample space x
+* slow mix or even failure to mix
+ * mcmc is like noisy gradient descent on the energy function
+ * or like noisy hill climbing on the probability with respect to the state of the chain
+ * the energy function may have several modes, each of blockaded by high energy barriers, hard to jump to one another
+
+![](../images/benjio_17/14.png)
+
+
+* how to avoid slow mix
+ * make low of high energy barriers
+  * by introducing controlling peaked distribution
+  ![](../images/benjio_17/15.png)
+  * by making deep neighbors
