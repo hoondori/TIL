@@ -1,5 +1,6 @@
 # Ch 17. Confronting the partition function
 
+
 * in undirected graph, many probabilistic models could be unnormalized dist.
 * need to be normalized by partition function
 * usually, computing partition function is intractable
