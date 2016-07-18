@@ -65,3 +65,22 @@
 * persistent CD(PCD) or SML
  * initialize mc with their states from the previous gradient step
  * vulerable when model dists changes a lot at each of gradient step
+
+## Pseudo-likelihood
+
+* the better way dealing with partition function is not to compute at all
+* by make use of computation of ratios of probabilities
+
+![](../images/benjio_18/9.png)
+
+* for conditional probabilities, it takes ratio-based form
+* a, c, should have small cases for tractability
+![](../images/benjio_18/10.png)
+
+* for n variables, each of which are conditionally dependent, Pseudo-likelihood is the following
+
+![](../images/benjio_18/11.png)
+
+* if each random variable has k different values, this requires only k*n evaluation, not kth n evaluation
+
+* maximum of Pseudo-likelihood is asymptotically consistent
