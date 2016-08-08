@@ -70,7 +70,43 @@
 * 논문
  * https://www.microsoft.com/en-us/research/wp-content/uploads/2016/02/pascanuIcassp2015.pdf
 
-* 자연어, ECN + RNN
+* 공격 유형 : reordering of malicious code
+ * handcrafted feature로는 대응 어려움
+* 대응 : as language, ESN + RNN
+* Echo state network
+ * RNN의 일종
+ * RNN의 학습의 어려움, dynamics의 대응으로 출현
+ * random/sparse connectivity
+ * 메아리로 일종의 잔상 효과, 확율적 경로 생성
+
+![](./images/security/13.png)
+
+* Max-pooling on RNN
+ * non-linear downsampling
+* Input as API call
+ * bit => instruction => API call
+
+![](./images/security/14.png)
+
+## 프로그램 : 트리로 구조화된 언어
+* 논문
+ * Building Program Vector Representations for Deep Learning
+ * http://sei.pku.edu.cn/~moull12/resource/PLP.pdf
+
+* 아이디어
+ * AST에서의 각 노드를 일종의 single layer networok로 상상
+ * 각 노드의 vector representation을 학습
+
+ ![](./images/security/15.png)
+
+ ![](./images/security/16.png)
+
+ * Tree-based CNN에 적용
+  * ex) 악성 코드 탐지
+  * ex) 프로그램 숙제 자동 채점
+
+ ![](./images/security/17.png)
+
 
 ## 난독화된 JavaScript 코드
 * 논문
@@ -87,24 +123,3 @@
  * ![](./images/security/12.png)  
 
 * A deep learning approach for detecting malicious JavaScript code (2016)
-
-
-* Building Program Vector Representations for Deep Learning
-http://sei.pku.edu.cn/~moull12/resource/PLP.pdf
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-* reference
-http://www.slideshare.net/liorrokach/cyber-securityshort
-http://www.slideshare.net/nasirbhutta/cyber-security-trends-and-globar-war
