@@ -1,10 +1,12 @@
 
 # 보안이란?
 ## 침해
-![](./images/security/1.png)
+<img src="./images/security/1.png" width="400"/>
+
 
 ## attack vector
-  ![](./images/security/2.png)
+<img src="./images/security/2.png" width="400"/>
+
 
 ## Malware
 * 공격 코드는 매우 작음 (수 바이트)
@@ -17,7 +19,8 @@
  * Anti-Disassemble/, Anti-VM
 
 
-![](./images/security/3.png)
+ <img src="./images/security/3.png" width="300"/>
+
 
 # AntiVirus
 ## 초창기 전통적 방식
@@ -47,11 +50,11 @@
 ## Microsoft kaggle challenge 2015
 * 일종의 자연어처럼, 그림처럼
 
-![](./images/security/4.png)
+<img src="./images/security/4.png" width="400"/>
 
-![](./images/security/5.png)
+<img src="./images/security/5.png" width="400"/>
 
-![](./images/security/6.png)
+<img src="./images/security/6.png" width="300"/>
 
 ## 난독화된 코드 조각에서 함수 탐지
 * 논문
@@ -61,9 +64,9 @@
 * 일종의 자연어로 보고 RNN 적용
 * 유사 사례 : Sung kim 교수님의 자동 코드 작성기
 
-![](./images/security/7.png)
+<img src="./images/security/7.png" width="400"/>
 
-![](./images/security/8.png)
+<img src="./images/security/8.png" width="400"/>
 
 ## Malware Classification with RNN, MS, 2015
 
@@ -79,14 +82,16 @@
  * random/sparse connectivity
  * 메아리로 일종의 잔상 효과, 확율적 경로 생성
 
-![](./images/security/13.png)
+<img src="./images/security/13.png" width="400"/>
+
 
 * Max-pooling on RNN
  * non-linear downsampling
 * Input as API call
  * bit => instruction => API call
 
-![](./images/security/14.png)
+<img src="./images/security/14.png" width="400"/>
+
 
 ## 프로그램 : 트리로 구조화된 언어
 * 논문
@@ -97,29 +102,31 @@
  * AST에서의 각 노드를 일종의 single layer networok로 상상
  * 각 노드의 vector representation을 학습
 
- ![](./images/security/15.png)
+<img src="./images/security/15.png" width="300"/>
 
- ![](./images/security/16.png)
+<img src="./images/security/16.png" width="400"/>
 
  * Tree-based CNN에 적용
   * ex) 악성 코드 탐지
   * ex) 프로그램 숙제 자동 채점
 
- ![](./images/security/17.png)
+<img src="./images/security/17.png" width="400"/>
 
 
 ## 난독화된 JavaScript 코드
 * 논문
  * https://www.researchgate.net/publication/254307605_Analysis_and_Identification_of_Malicious_JavaScript_Code
 
-![](./images/security/9.png)  
+<img src="./images/security/9.png" width="300"/>
+
 
 * 난독화 해제 거의 불가능
 * handcraft-feature selection ++ NN
- * ![](./images/security/10.png)  
+ * <img src="./images/security/9.png" width="300"/>
 
- * ![](./images/security/11.png)
+ * <img src="./images/security/10.png" width="300"/>
 
- * ![](./images/security/12.png)  
+ * <img src="./images/security/11.png" width="300"/>
+
 
 * A deep learning approach for detecting malicious JavaScript code (2016)
